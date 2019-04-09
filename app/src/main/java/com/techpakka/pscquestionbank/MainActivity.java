@@ -97,8 +97,8 @@ public class MainActivity extends AppCompatActivity implements
                     progressDialog.setMessage("Please wait...");
                     progressDialog.setCanceledOnTouchOutside(false);
                     Map<String, Object> data1 = new HashMap<>();
-                    data1.put("data", editText.getText().toString());
-                    data1.put("data1", editText2.getText().toString());
+                    data1.put("question", editText.getText().toString());
+                    data1.put("answer", editText2.getText().toString());
                     db.collection("App").document(category_name).collection(category)
                             .add(data1)
                       .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
