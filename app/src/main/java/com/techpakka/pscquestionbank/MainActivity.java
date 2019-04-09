@@ -3,6 +3,7 @@ package com.techpakka.pscquestionbank;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements
     private ImageView img_category_add;
     private String category_name;
     private ProgressDialog progressDialog;
+    private EditText editText31;
+    private Button button3;
+
+    private ArrayAdapter<String> spinneradapter;
 
 
     @Override
@@ -51,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        category_name = getIntent().getStringExtra("category");
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCanceledOnTouchOutside(false);
@@ -61,9 +67,20 @@ public class MainActivity extends AppCompatActivity implements
         initViews();
         setUpSpinner();
         onClick();
-
     }
 
+    private void addSubCategory(String category_name2) {
+        Map<String, Object> data1 = new HashMap<>();
+        db.collection(category_name).document(category_name2)
+                .set(data1)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        setUpSpinner();
+
+                    }
+                });
+    }
 
 
     private void initializeFireStore() {
@@ -74,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!editText.getText().toString().equals("") && !editText2.getText().toString().equals("") && !editText3.getText().toString().equals("") && !editText4.getText().toString().equals("") && !editText5.getText().toString().equals("")){
+                if (!editText.getText().toString().equals("") && !editText2.getText().toString().equals("")){
                     final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
                     progressDialog.show();
                     progressDialog.setMessage("Please wait...");
@@ -82,11 +99,7 @@ public class MainActivity extends AppCompatActivity implements
                     Map<String, Object> data1 = new HashMap<>();
                     data1.put("data", editText.getText().toString());
                     data1.put("data1", editText2.getText().toString());
-                    data1.put("data2", editText3.getText().toString());
-                    data1.put("data3", editText4.getText().toString());
-                    data1.put("data4", editText5.getText().toString());
-
-                    db.collection("App").document("Categories").collection(category)
+                    db.collection("App").document(category_name).collection(category)
                             .add(data1)
                       .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                           @Override
@@ -107,15 +120,12 @@ public class MainActivity extends AppCompatActivity implements
         btn_submit = findViewById(R.id.btn_submit);
         editText = findViewById(R.id.editText);
         editText2 = findViewById(R.id.editText2);
-        editText3 = findViewById(R.id.editText3);
-        editText4 = findViewById(R.id.editText4);
-        editText5 = findViewById(R.id.editText5);
     }
 
     private void setUpSpinner() {
 
         final List<String> plantsList = new ArrayList<>();
-                db.collection("categoryname")
+                db.collection(category_name)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -128,13 +138,13 @@ public class MainActivity extends AppCompatActivity implements
                                 Spinner spinner = findViewById(R.id.spinner_category);
 
                                 spinner.setOnItemSelectedListener(MainActivity.this);
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                spinneradapter = new ArrayAdapter<String>(
                                         MainActivity.this ,android.R.layout.simple_spinner_item,plantsList);
 
-                                adapter.setDropDownViewResource
+                                spinneradapter.setDropDownViewResource
                                         (android.R.layout.simple_spinner_dropdown_item);
 
-                                spinner.setAdapter(adapter);
+                                spinner.setAdapter(spinneradapter);
                                 Log.d("data", String.valueOf(document.getString("af")));
                             }
                         } else {
@@ -162,5 +172,52 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public void showDialog(View view) {
+        DialogSpinner dialogSpinner = new DialogSpinner(MainActivity.this);
+        dialogSpinner.setCanceledOnTouchOutside(false);
+        dialogSpinner.show();
+    }
+
+    public class DialogSpinner extends Dialog{
+
+        private Button button4;
+
+        public DialogSpinner(Context context) {
+            super(context);
+        }
+
+        public DialogSpinner( Context context, int themeResId) {
+            super(context, themeResId);
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.custom_dialog);
+            editText31 = findViewById(R.id.editText3);
+            button3 = findViewById(R.id.button3);
+            button4 = findViewById(R.id.button4);
+            button4.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
+            button3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!editText31.getText().toString().equals("")){
+                        addSubCategory(editText31.getText().toString());
+                        dismiss();
+                    }
+                    else {
+                        editText31.setError("Enter data");
+                    }
+
+                }
+            });
+        }
     }
 }
