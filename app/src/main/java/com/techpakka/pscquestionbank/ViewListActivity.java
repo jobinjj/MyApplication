@@ -27,6 +27,7 @@ public class ViewListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_list);
 
+
         progressDialog = new ProgressDialog(ViewListActivity.this);
         progressDialog.setCanceledOnTouchOutside(false);
         db = FirebaseFirestore.getInstance();

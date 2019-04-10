@@ -1,24 +1,19 @@
 package com.techpakka.pscquestionbank;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements
+public class AddSubcategoryActivity extends AppCompatActivity implements
         AdapterView.OnItemSelectedListener{
 
     private static final String TAG = "tag";
@@ -49,15 +44,18 @@ public class MainActivity extends AppCompatActivity implements
     private Button button3;
 
     private ArrayAdapter<String> spinneradapter;
+    private String category_id;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_subcategory_add);
 
-        category_name = getIntent().getStringExtra("category");
-        progressDialog = new ProgressDialog(MainActivity.this);
+        category_name = getIntent().getStringExtra("category_name");
+        category_id = getIntent().getStringExtra("category_id");
+
+        progressDialog = new ProgressDialog(AddSubcategoryActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
@@ -77,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onSuccess(Void aVoid) {
                         setUpSpinner();
-
                     }
                 });
     }
@@ -92,24 +89,24 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 if (!editText.getText().toString().equals("") && !editText2.getText().toString().equals("")){
-                    final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                    final ProgressDialog progressDialog = new ProgressDialog(AddSubcategoryActivity.this);
                     progressDialog.show();
                     progressDialog.setMessage("Please wait...");
                     progressDialog.setCanceledOnTouchOutside(false);
                     Map<String, Object> data1 = new HashMap<>();
                     data1.put("question", editText.getText().toString());
                     data1.put("answer", editText2.getText().toString());
-                    db.collection("App").document(category_name).collection(category)
+                    db.collection(category_name).document(category).collection(category)
                             .add(data1)
                       .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                           @Override
                           public void onSuccess(DocumentReference documentReference) {
                               progressDialog.dismiss();
-                              Toast.makeText(MainActivity.this, "added succesfully", Toast.LENGTH_SHORT).show();
+                              Toast.makeText(AddSubcategoryActivity.this, "added succesfully", Toast.LENGTH_SHORT).show();
                           }
                       });
                 }else {
-                    Toast.makeText(MainActivity.this, "enter values!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddSubcategoryActivity.this, "enter values!!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -137,9 +134,9 @@ public class MainActivity extends AppCompatActivity implements
                                 plantsList.add(String.valueOf(document.getId()));
                                 Spinner spinner = findViewById(R.id.spinner_category);
 
-                                spinner.setOnItemSelectedListener(MainActivity.this);
+                                spinner.setOnItemSelectedListener(AddSubcategoryActivity.this);
                                 spinneradapter = new ArrayAdapter<String>(
-                                        MainActivity.this ,android.R.layout.simple_spinner_item,plantsList);
+                                        AddSubcategoryActivity.this ,android.R.layout.simple_spinner_item,plantsList);
 
                                 spinneradapter.setDropDownViewResource
                                         (android.R.layout.simple_spinner_dropdown_item);
@@ -175,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void showDialog(View view) {
-        DialogSpinner dialogSpinner = new DialogSpinner(MainActivity.this);
+        DialogSpinner dialogSpinner = new DialogSpinner(AddSubcategoryActivity.this);
         dialogSpinner.setCanceledOnTouchOutside(false);
         dialogSpinner.show();
     }
