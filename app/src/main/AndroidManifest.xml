@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ViewDetailActivity"></activity>
-        <activity android:name=".ViewListActivity" />
+        <activity android:name=".ViewListActivity"
+            android:parentActivityName=".ViewActivity"/>
         <activity android:name=".ViewActivity"
             android:parentActivityName=".HomeActivity" />
         <activity android:name=".HomeActivity">

@@ -16,7 +16,9 @@ import java.util.List;
 
 public class ViewDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
-    List<Data> list = new ArrayList<>();
+    List<String> list = new ArrayList<>();
+    private String category_name;
+    private String sub_categoryname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,19 +26,18 @@ public class ViewDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_detail);
 
         db = FirebaseFirestore.getInstance();
-        db.collection("App").document("india").collection("india")
+        sub_categoryname = getIntent().getStringExtra("subcategory_name");
+        category_name = getIntent().getStringExtra("category_name");
+        db.collection(category_name).document(sub_categoryname).collection(sub_categoryname)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        //Toast.makeText(ViewActivity.this, "suuccess", Toast.LENGTH_SHORT).show();
                         for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
-                            Data data = queryDocumentSnapshot.toObject(Data.class);
-                            Toast.makeText(ViewDetailActivity.this, data.getQuestion()+data.getAnswer(), Toast.LENGTH_SHORT).show();
-                            list.add(data);
-                            Log.d("serverdata",data.getQuestion()+data.getAnswer());
+                            list.add(queryDocumentSnapshot.getId());
                         }
                     }
                 });
+
     }
 }
